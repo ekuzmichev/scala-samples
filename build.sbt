@@ -4,7 +4,14 @@ ThisBuild / organization := "ru.ekuzmichev"
 ThisBuild / version := "0.1-SNAPSHOT"
 ThisBuild / scalaVersion := "2.12.8"
 
-lazy val `cats-retry` =
+lazy val root =
+  project
+  .in(file("."))
+  .aggregate(
+    `cats-retry-samples`
+  )
+
+lazy val `cats-retry-samples` =
   project
     .settings(
       libraryDependencies ++= Seq(dependencies.catsRetry),
