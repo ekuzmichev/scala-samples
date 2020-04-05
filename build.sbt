@@ -14,13 +14,13 @@ lazy val root =
 lazy val `cats-retry-samples` =
   project
     .settings(
-      libraryDependencies ++= Seq(dependencies.catsRetry),
+      libraryDependencies ++= Seq(libs.catsRetry),
       Seq(scalacOptions ++= fpScalaOptions)
     )
 
 lazy val fpScalaOptions = Seq("-Xfatal-warnings", "-Ypartial-unification")
 
-lazy val dependencies = new {
+lazy val libs = new {
   private val catsRetryV = "1.1.0"
 
   val catsRetry = "com.github.cb372" %% "cats-retry" % catsRetryV
