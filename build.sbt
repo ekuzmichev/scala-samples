@@ -1,7 +1,20 @@
 name := "scala_samples"
 
-version := "0.1"
+ThisBuild / organization := "ru.ekuzmichev"
+ThisBuild / version := "0.1-SNAPSHOT"
+ThisBuild / scalaVersion := "2.12.8"
 
-scalaVersion := "2.12.8"
+lazy val `cats-retry` =
+  project
+    .settings(
+      libraryDependencies ++= Seq(dependencies.catsRetry),
+      Seq(scalacOptions ++= fpScalaOptions)
+    )
 
-scalacOptions ++= Seq("-Xfatal-warnings", "-Ypartial-unification")
+lazy val fpScalaOptions = Seq("-Xfatal-warnings", "-Ypartial-unification")
+
+lazy val dependencies = new {
+  private val catsRetryV = "1.1.0"
+
+  val catsRetry = "com.github.cb372" %% "cats-retry" % catsRetryV
+}
