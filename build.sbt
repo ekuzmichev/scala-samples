@@ -1,4 +1,4 @@
-name := "scala_sbt_template"
+name := "scala_samples"
 
 version := "0.1"
 
