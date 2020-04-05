@@ -1,0 +1,8 @@
+*.class
+*.log
+
+.idea/
+.idea_modules/
+target/
+out/
+*.iws
