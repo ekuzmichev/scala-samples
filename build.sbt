@@ -1,4 +1,4 @@
-name := "scala_samples"
+name := "scala-samples"
 
 ThisBuild / organization := "ru.ekuzmichev"
 ThisBuild / version := "0.1-SNAPSHOT"
