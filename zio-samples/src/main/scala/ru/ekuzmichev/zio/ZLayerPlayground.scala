@@ -73,9 +73,9 @@ object ZLayerPlayground {
   }
 }
 
-import ru.ekuzmichev.zio.ZLayerPlayground._
-
 object ZLayerApp extends App {
+  import ZLayerPlayground._
+  
   val baseLayer: ULayer[Has[Mail]] = MailLayer.console
   val userRepoLayer: URLayer[Has[Mail], Has[UserRepository]] =
     ZLayer.requires[Has[Mail]] ++ MongoDbLayer.live >>> UserRepositoryLayer.live >>> UserRepositoryLayer.cached
