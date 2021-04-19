@@ -30,19 +30,25 @@ lazy val `zio-samples` =
 lazy val `zio-kafka` =
   project
     .settings(
-      libraryDependencies ++= Seq(libs.zioStreams, libs.zioKafka),
+      libraryDependencies ++= Seq(
+        libs.zioStreams,
+        libs.zioKafka,
+        libs.kafkaStreamsCirce
+      ),
       Seq(scalacOptions ++= fpScalaOptions)
     )
 
 lazy val fpScalaOptions = Seq("-Xfatal-warnings", "-Ypartial-unification")
 
 lazy val libs = new {
-  val catsRetryV = "1.1.0"
-  val zioV       = "1.0.2"
-  val zioKafkaV       = "0.14.0"
+  val catsRetryV         = "1.1.0"
+  val kafkaStreamsCirceV = "0.6.3"
+  val zioV               = "1.0.2"
+  val zioKafkaV          = "0.14.0"
 
-  val catsRetry  = "com.github.cb372" %% "cats-retry"  % catsRetryV
-  val zio        = "dev.zio"          %% "zio"         % zioV
-  val zioKafka   = "dev.zio"          %% "zio-kafka"   % zioKafkaV
-  val zioStreams = "dev.zio"          %% "zio-streams" % zioV
+  val catsRetry         = "com.github.cb372" %% "cats-retry"          % catsRetryV
+  val kafkaStreamsCirce = "com.goyeau"       %% "kafka-streams-circe" % kafkaStreamsCirceV
+  val zio               = "dev.zio"          %% "zio"                 % zioV
+  val zioKafka          = "dev.zio"          %% "zio-kafka"           % zioKafkaV
+  val zioStreams        = "dev.zio"          %% "zio-streams"         % zioV
 }
