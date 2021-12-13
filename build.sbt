@@ -54,7 +54,8 @@ lazy val commonScalaOptions =
     "-feature",
     "-deprecation",
     "-unchecked",
-    "-language:postfixOps"
+    "-language:postfixOps",
+    "-language:higherKinds"
   )
 
 lazy val libs = new {
