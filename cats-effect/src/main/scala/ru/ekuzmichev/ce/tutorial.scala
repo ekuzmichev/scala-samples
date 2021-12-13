@@ -6,9 +6,10 @@ import cats.syntax.all._
 import java.io._
 
 object tutorial {
-  def copy[F[_]: Sync](origin: File, destination: File): F[Long] = inputOutputStreams(origin, destination).use {
-    case (in, out) => transfer(in, out)
-  }
+  def copy[F[_]: Sync](origin: File, destination: File, bufferSize: Int): F[Long] =
+    inputOutputStreams(origin, destination).use {
+      case (in, out) => transfer(in, out, bufferSize)
+    }
 
   def inputStream[F[_]: Sync](f: File): Resource[F, FileInputStream] =
     Resource.make {
@@ -35,8 +36,8 @@ object tutorial {
               else Sync[F].pure(acc)
     } yield count
 
-  def transfer[F[_]: Sync](origin: InputStream, destination: OutputStream): F[Long] =
-    transmit(origin, destination, new Array[Byte](1024 * 10), 0L)
+  def transfer[F[_]: Sync](origin: InputStream, destination: OutputStream, bufferSize: Int): F[Long] =
+    transmit(origin, destination, new Array[Byte](bufferSize), 0L)
 }
 
 import tutorial.copy
@@ -48,18 +49,24 @@ object Main extends IOApp {
           else IO.unit
       orig = new File(args(0))
       dest = new File(args(1))
+      bufferSizeRaw <- IO(args(2))
+                        .handleErrorWith(_ => IO.raiseError(new IllegalArgumentException(s"Not found arg bufferSize")))
+      bufferSize <- IO(bufferSizeRaw.toInt)
+                     .handleErrorWith(_ =>
+                       IO.raiseError(new IllegalArgumentException(s"Argument bufferSize not parseable to int"))
+                     )
       _ <- if (orig.getPath == dest.getPath)
             IO.raiseError(new IllegalArgumentException(s"Origin file can not be destination file"))
           else IO.unit
       _ <- if (dest.exists())
             IO.println(s"Destination file ${dest.getPath} already exists. Continue? [yN]") >>
-              IO.readLine.flatMap(input => if (input.toLowerCase == "y") doCopy(orig, dest) else IO.unit)
-          else doCopy(orig, dest)
+              IO.readLine.flatMap(input => if (input.toLowerCase == "y") doCopy(orig, dest, bufferSize) else IO.unit)
+          else doCopy(orig, dest, bufferSize)
     } yield ExitCode.Success
 
-  private def doCopy(orig: File, dest: File): IO[Unit] =
+  private def doCopy(orig: File, dest: File, bufferSize: Int): IO[Unit] =
     for {
-      count <- copy[IO](orig, dest)
+      count <- ((origin: File, destination: File) => copy[IO](origin, destination, bufferSize))(orig, dest)
       _     <- IO.println(s"$count bytes copied from ${orig.getPath} to ${dest.getPath}")
     } yield ()
 }
