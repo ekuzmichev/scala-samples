@@ -46,9 +46,20 @@ object Main extends IOApp {
     for {
       _ <- if (args.length < 2) IO.raiseError(new IllegalArgumentException("Need origin and destination files"))
           else IO.unit
-      orig  = new File(args(0))
-      dest  = new File(args(1))
+      orig = new File(args(0))
+      dest = new File(args(1))
+      _ <- if (orig.getPath == dest.getPath)
+            IO.raiseError(new IllegalArgumentException(s"Origin file can not be destination file"))
+          else IO.unit
+      _ <- if (dest.exists())
+            IO.println(s"Destination file ${dest.getPath} already exists. Continue? [yN]") >>
+              IO.readLine.flatMap(input => if (input.toLowerCase == "y") doCopy(orig, dest) else IO.unit)
+          else doCopy(orig, dest)
+    } yield ExitCode.Success
+
+  private def doCopy(orig: File, dest: File): IO[Unit] =
+    for {
       count <- copy[IO](orig, dest)
       _     <- IO.println(s"$count bytes copied from ${orig.getPath} to ${dest.getPath}")
-    } yield ExitCode.Success
+    } yield ()
 }
