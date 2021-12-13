@@ -1,27 +1,28 @@
 package ru.ekuzmichev.ce
 
 import cats.effect._
+import cats.effect.std.Console
 import cats.syntax.all._
 
-import java.io._
+import java.io.{ Console => _, _ }
 
 object tutorial {
-  def copy[F[_]: Sync](origin: File, destination: File, bufferSize: Int): F[Long] =
+  def copy[F[_]: Sync: Console](origin: File, destination: File, bufferSize: Int): F[Long] =
     inputOutputStreams(origin, destination).use {
       case (in, out) => transfer(in, out, bufferSize)
     }
 
-  def inputStream[F[_]: Sync](f: File): Resource[F, FileInputStream] =
+  def inputStream[F[_]: Sync: Console](f: File): Resource[F, FileInputStream] =
     Resource.make {
-      Sync[F].blocking(new FileInputStream(f))
+      Console[F].println("Closing input stream") >> Sync[F].blocking(new FileInputStream(f))
     }(inStream => Sync[F].blocking(inStream.close()).handleErrorWith(_ => Sync[F].unit))
 
-  def outputStream[F[_]: Sync](f: File): Resource[F, FileOutputStream] =
+  def outputStream[F[_]: Sync: Console](f: File): Resource[F, FileOutputStream] =
     Resource.make {
-      Sync[F].blocking(new FileOutputStream(f)) // build
+      Console[F].println("Closing output stream") >> Sync[F].blocking(new FileOutputStream(f)) // build
     }(outStream => Sync[F].blocking(outStream.close()).handleErrorWith(_ => Sync[F].unit))
 
-  def inputOutputStreams[F[_]: Sync](in: File, out: File): Resource[F, (InputStream, OutputStream)] =
+  def inputOutputStreams[F[_]: Sync: Console](in: File, out: File): Resource[F, (InputStream, OutputStream)] =
     for {
       inStream  <- inputStream(in)
       outStream <- outputStream(out)
