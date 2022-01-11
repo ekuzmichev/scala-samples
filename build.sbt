@@ -38,7 +38,9 @@ lazy val `cats-effect` =
 lazy val lang =
   project
     .settings(
-      libraryDependencies ++= Seq(),
+      libraryDependencies ++= Seq(
+        "com.jakewharton.byteunits" % "byteunits" % "0.9.1"
+      ),
       Seq(scalacOptions ++= commonScalaOptions)
     )
 
