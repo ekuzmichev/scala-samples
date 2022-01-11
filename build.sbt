@@ -11,6 +11,7 @@ lazy val root =
     .aggregate(
       `cats-retry-samples`,
       `cats-effect`,
+      lang,
       `zio-samples`,
       `zio-kafka`
     )
@@ -31,6 +32,13 @@ lazy val `cats-effect` =
         libs.catsEffectScalatest,
         libs.catsEffectTestkit
       ),
+      Seq(scalacOptions ++= commonScalaOptions)
+    )
+
+lazy val lang =
+  project
+    .settings(
+      libraryDependencies ++= Seq(),
       Seq(scalacOptions ++= commonScalaOptions)
     )
 
