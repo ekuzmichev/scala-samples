@@ -30,7 +30,10 @@ lazy val `cats-effect` =
         libs.catsEffect,
         libs.munitCatsEffectTest,
         libs.catsEffectScalatest,
-        libs.catsEffectTestkit
+        libs.catsEffectTestkit,
+        "io.chrisdavenport" %% "log4cats-core"  % "2.1.1",
+        "io.chrisdavenport" %% "log4cats-slf4j" % "2.1.1",
+        "org.slf4j" % "slf4j-simple" % "1.7.32"
       ),
       Seq(scalacOptions ++= commonScalaOptions)
     )
