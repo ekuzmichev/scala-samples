@@ -9,6 +9,7 @@ lazy val root =
   project
     .in(file("."))
     .aggregate(
+      cats,
       `cats-retry-samples`,
       `cats-effect`,
       lang,
@@ -28,12 +29,23 @@ lazy val `cats-effect` =
     .settings(
       libraryDependencies ++= Seq(
         libs.catsEffect,
+        libs.catsFree,
         libs.munitCatsEffectTest,
         libs.catsEffectScalatest,
         libs.catsEffectTestkit,
-        "io.chrisdavenport" %% "log4cats-core"  % "2.1.1",
-        "io.chrisdavenport" %% "log4cats-slf4j" % "2.1.1",
-        "org.slf4j" % "slf4j-simple" % "1.7.32"
+        "org.typelevel" %% "log4cats-core"  % "2.2.0",
+        "org.typelevel" %% "log4cats-slf4j" % "2.2.0",
+        "org.slf4j"     % "slf4j-simple"    % "1.7.32"
+      ),
+      Seq(scalacOptions ++= commonScalaOptions)
+    )
+
+lazy val `cats` =
+  project
+    .settings(
+      libraryDependencies ++= Seq(
+        libs.catsCore,
+        libs.catsFree
       ),
       Seq(scalacOptions ++= commonScalaOptions)
     )
@@ -81,9 +93,12 @@ lazy val libs = new {
   val kafkaStreamsCirceV = "0.6.3"
   val zioV               = "1.0.2"
   val zioKafkaV          = "0.14.0"
+  val catsV              = "2.7.0"
   val catsEffectV        = "3.3.0"
 
   val catsRetry           = "com.github.cb372" %% "cats-retry"                    % catsRetryV
+  val catsCore            = "org.typelevel"    %% "cats-core"                     % catsV withSources () withJavadoc ()
+  val catsFree            = "org.typelevel"    %% "cats-free"                     % catsV withSources () withJavadoc ()
   val catsEffect          = "org.typelevel"    %% "cats-effect"                   % catsEffectV withSources () withJavadoc ()
   val munitCatsEffectTest = "org.typelevel"    %% "munit-cats-effect-3"           % "1.0.6" % Test
   val catsEffectScalatest = "org.typelevel"    %% "cats-effect-testing-scalatest" % "1.4.0" % Test
