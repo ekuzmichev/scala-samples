@@ -43,6 +43,21 @@ object FreeMonadsArticle extends App {
 
   println(res)
 
-  type ErrorOr[A] = Xor[String, A]
+  type ErrorOr[A] = Either[String, A]
+
+  def eitherInterpreter: Orders ~> ErrorOr =
+    new (Orders ~> ErrorOr) {
+      def apply[A](fa: Orders[A]): ErrorOr[A] =
+        fa match {
+          case Buy(stock, amount) =>
+            Right(s"$stock - $amount")
+          case Sell(stock, amount) =>
+            Left("Why are you selling that?")
+        }
+    }
+
+  val res2: ErrorOr[Response] = smartTrade.foldMap(eitherInterpreter)
+
+  println(res2)
 
 }
