@@ -55,7 +55,8 @@ lazy val lang =
     .settings(
       libraryDependencies ++= Seq(
         "com.jakewharton.byteunits" % "byteunits" % "0.9.1",
-        "commons-io" % "commons-io" % "2.6"
+        "commons-io" % "commons-io" % "2.6",
+        "com.typesafe.akka" %% "akka-actor-typed" % "2.6.19"
       ),
       Seq(scalacOptions ++= commonScalaOptions)
     )
