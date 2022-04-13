@@ -16,7 +16,7 @@ object NothingType extends App {
 
   def gimmePrecious2: MyPrecious = null
   def gimmePrecious3: Null       = null
-  def gimmeNumber2: Int          = null
+  // def gimmeNumber2: Int           = null // does not compile
   // def gimmeNumber3: Null = 1 // does not compile
 
   // Nothing is at the bottom of the whole hierarchy
