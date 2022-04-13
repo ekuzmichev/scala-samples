@@ -54,7 +54,8 @@ lazy val lang =
   project
     .settings(
       libraryDependencies ++= Seq(
-        "com.jakewharton.byteunits" % "byteunits" % "0.9.1"
+        "com.jakewharton.byteunits" % "byteunits" % "0.9.1",
+        "commons-io" % "commons-io" % "2.6"
       ),
       Seq(scalacOptions ++= commonScalaOptions)
     )
