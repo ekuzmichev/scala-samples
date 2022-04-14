@@ -1,8 +1,10 @@
 name := "scala-samples"
 
+val scalaV = "2.12.8"
+
 ThisBuild / organization := "ru.ekuzmichev"
 ThisBuild / version := "0.1-SNAPSHOT"
-ThisBuild / scalaVersion := "2.12.8"
+ThisBuild / scalaVersion := scalaV
 ThisBuild / autoCompilerPlugins := true
 
 lazy val root =
@@ -66,7 +68,8 @@ lazy val lang =
     .settings(
       libraryDependencies ++= Seq(
         libs.commonsIo,
-        libs.byteUnits
+        libs.byteUnits,
+        libs.scalaReflect
       ),
       Seq(scalacOptions ++= commonScalaOptions)
     )
@@ -123,6 +126,7 @@ lazy val libs = new {
   val commonsIo           = "commons-io"                % "commons-io"                     % commonsIoV
   val kafkaStreamsCirce   = "com.goyeau"                %% "kafka-streams-circe"           % kafkaStreamsCirceV
   val munitCatsEffectTest = "org.typelevel"             %% "munit-cats-effect-3"           % "1.0.6" % Test
+  val scalaReflect        = "org.scala-lang"            % "scala-reflect"                  % scalaV
   val zio                 = "dev.zio"                   %% "zio"                           % zioV
   val zioKafka            = "dev.zio"                   %% "zio-kafka"                     % zioKafkaV
   val zioStreams          = "dev.zio"                   %% "zio-streams"                   % zioV
