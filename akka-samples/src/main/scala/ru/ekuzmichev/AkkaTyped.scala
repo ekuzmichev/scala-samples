@@ -23,7 +23,7 @@ object AkkaTyped extends App {
     "SimpleShoppingActor"
   )
 
-//  shoppingRootActor ! "Hello actor" // does not compile
+  //  shoppingRootActor ! "Hello actor" // does not compile
   shoppingRootActor ! ValidateCart
 
   // 2 mutable state

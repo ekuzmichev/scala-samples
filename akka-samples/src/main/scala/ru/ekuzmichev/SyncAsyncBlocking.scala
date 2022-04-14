@@ -3,7 +3,7 @@ package ru.ekuzmichev
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 
-import scala.concurrent.{ Future, Promise }
+import scala.concurrent.{Future, Promise}
 
 object SyncAsyncBlocking extends App {
   // synchronous and blocking

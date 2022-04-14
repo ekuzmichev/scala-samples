@@ -9,12 +9,23 @@ lazy val root =
   project
     .in(file("."))
     .aggregate(
+      `akka-samples`,
       cats,
       `cats-retry-samples`,
       `cats-effect`,
       lang,
       `zio-samples`,
       `zio-kafka`
+    )
+
+lazy val `akka-samples` =
+  project
+    .settings(
+      libraryDependencies ++= Seq(
+        libs.akkaActorTyped,
+        libs.akkaStream
+      ),
+      Seq(scalacOptions ++= commonScalaOptions)
     )
 
 lazy val `cats-retry-samples` =
@@ -54,10 +65,8 @@ lazy val lang =
   project
     .settings(
       libraryDependencies ++= Seq(
-        "com.jakewharton.byteunits" % "byteunits" % "0.9.1",
-        "commons-io" % "commons-io" % "2.6",
-        "com.typesafe.akka" %% "akka-actor-typed" % "2.6.19",
-        "com.typesafe.akka" %% "akka-stream" % "2.6.19"
+        libs.commonsIo,
+        libs.byteUnits
       ),
       Seq(scalacOptions ++= commonScalaOptions)
     )
@@ -92,22 +101,29 @@ lazy val commonScalaOptions =
   )
 
 lazy val libs = new {
-  val catsRetryV         = "1.1.0"
-  val kafkaStreamsCirceV = "0.6.3"
-  val zioV               = "1.0.2"
-  val zioKafkaV          = "0.14.0"
-  val catsV              = "2.7.0"
+  val akkaVersion        = "2.6.19"
+  val byteUnitsV         = "0.9.1"
   val catsEffectV        = "3.3.0"
+  val catsRetryV         = "1.1.0"
+  val catsV              = "2.7.0"
+  val commonsIoV         = "2.6"
+  val kafkaStreamsCirceV = "0.6.3"
+  val zioKafkaV          = "0.14.0"
+  val zioV               = "1.0.2"
 
-  val catsRetry           = "com.github.cb372" %% "cats-retry"                    % catsRetryV
-  val catsCore            = "org.typelevel"    %% "cats-core"                     % catsV withSources () withJavadoc ()
-  val catsFree            = "org.typelevel"    %% "cats-free"                     % catsV withSources () withJavadoc ()
-  val catsEffect          = "org.typelevel"    %% "cats-effect"                   % catsEffectV withSources () withJavadoc ()
-  val munitCatsEffectTest = "org.typelevel"    %% "munit-cats-effect-3"           % "1.0.6" % Test
-  val catsEffectScalatest = "org.typelevel"    %% "cats-effect-testing-scalatest" % "1.4.0" % Test
-  val catsEffectTestkit   = "org.typelevel"    %% "cats-effect-testkit"           % catsEffectV % Test
-  val kafkaStreamsCirce   = "com.goyeau"       %% "kafka-streams-circe"           % kafkaStreamsCirceV
-  val zio                 = "dev.zio"          %% "zio"                           % zioV
-  val zioKafka            = "dev.zio"          %% "zio-kafka"                     % zioKafkaV
-  val zioStreams          = "dev.zio"          %% "zio-streams"                   % zioV
+  val akkaActorTyped      = "com.typesafe.akka"         %% "akka-actor-typed"              % akkaVersion withSources () withJavadoc ()
+  val akkaStream          = "com.typesafe.akka"         %% "akka-stream"                   % akkaVersion withSources () withJavadoc ()
+  val byteUnits           = "com.jakewharton.byteunits" % "byteunits"                      % byteUnitsV
+  val catsCore            = "org.typelevel"             %% "cats-core"                     % catsV withSources () withJavadoc ()
+  val catsEffect          = "org.typelevel"             %% "cats-effect"                   % catsEffectV withSources () withJavadoc ()
+  val catsEffectScalatest = "org.typelevel"             %% "cats-effect-testing-scalatest" % "1.4.0" % Test
+  val catsEffectTestkit   = "org.typelevel"             %% "cats-effect-testkit"           % catsEffectV % Test
+  val catsFree            = "org.typelevel"             %% "cats-free"                     % catsV withSources () withJavadoc ()
+  val catsRetry           = "com.github.cb372"          %% "cats-retry"                    % catsRetryV
+  val commonsIo           = "commons-io"                % "commons-io"                     % commonsIoV
+  val kafkaStreamsCirce   = "com.goyeau"                %% "kafka-streams-circe"           % kafkaStreamsCirceV
+  val munitCatsEffectTest = "org.typelevel"             %% "munit-cats-effect-3"           % "1.0.6" % Test
+  val zio                 = "dev.zio"                   %% "zio"                           % zioV
+  val zioKafka            = "dev.zio"                   %% "zio-kafka"                     % zioKafkaV
+  val zioStreams          = "dev.zio"                   %% "zio-streams"                   % zioV
 }
