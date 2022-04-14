@@ -56,7 +56,8 @@ lazy val lang =
       libraryDependencies ++= Seq(
         "com.jakewharton.byteunits" % "byteunits" % "0.9.1",
         "commons-io" % "commons-io" % "2.6",
-        "com.typesafe.akka" %% "akka-actor-typed" % "2.6.19"
+        "com.typesafe.akka" %% "akka-actor-typed" % "2.6.19",
+        "com.typesafe.akka" %% "akka-stream" % "2.6.19"
       ),
       Seq(scalacOptions ++= commonScalaOptions)
     )
