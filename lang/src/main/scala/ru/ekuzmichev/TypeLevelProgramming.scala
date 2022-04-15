@@ -1,10 +1,10 @@
 package ru.ekuzmichev
 
-import ru.ekuzmichev.TypeLevelProgramming.{+, four, two, zero}
-
 object TypeLevelProgramming extends App {
 
-  // Part 1
+  // ================================================================================================================ //
+  // PART 1
+  // ================================================================================================================ //
 
   import scala.reflect.runtime.universe._
 
@@ -74,9 +74,11 @@ object TypeLevelProgramming extends App {
   val lteComparison: _1 <= _1 = <=[_1, _1]
   println(show(lteComparison))
 
-//  val invalidLteComparison: _3 <= _2 = <=[_3, _2] // does not compile
+  // val invalidLteComparison: _3 <= _2 = <=[_3, _2] // does not compile
 
-  // Part 2
+  // ================================================================================================================ //
+  // PART 2
+  // ================================================================================================================ //
 
   // ADD NUMBERS as types
   trait +[A <: Nat, B <: Nat, S <: Nat] // S - sum between A and B
@@ -151,4 +153,132 @@ object TypeLevelProgramming extends App {
 
   infer.runInferExample()
 
+  // ================================================================================================================ //
+  // PART 3
+  // ================================================================================================================ //
+
+  // Sort instances at compile time (Merge-sort algorithm)
+  // Heterogeneous list
+  trait HList
+  class HNil extends HList
+  class ::[H <: Nat, T <: HList] extends HList
+
+  /*
+    Merge-sort algorithm
+    - split the list in half
+    - sort the halves
+    - merge them back
+   */
+
+  trait Split[HL <: HList, L <: HList, R <: HList]
+  object Split {
+    // Axiom 1: Empty list is split into empty and empty lists
+    implicit val basic: Split[HNil, HNil, HNil] = new Split[HNil, HNil, HNil] {}
+    // Axiom 2: Single-element list is split into the same list on left and empty list on right
+    implicit def basic2[N <: Nat]: Split[N :: HNil, N :: HNil, HNil] = new Split[N :: HNil, N :: HNil, HNil] {}
+    // T - tail is split into L and R
+    implicit def inductive[N1 <: Nat, N2 <: Nat, T <: HList, L <: HList, R <: HList]
+      (implicit split: Split[T, L, R]): Split[N1 :: N2 :: T, N1 :: L, N2 :: R] =
+      new Split[N1 :: N2 :: T, N1 :: L, N2 :: R] {}
+    def apply[HL <: HList, L <: HList, R <: HList](implicit split: Split[HL, L, R]): Split[HL, L, R] = split
+  }
+
+  val validSplit: Split[_1 :: _2 :: _3 :: HNil, _1 :: _3 :: HNil, _2 :: HNil] = Split.apply
+  /*
+    Compiler works as:
+    - require implicit Split[_1 :: _2 :: _3 :: HNil, _1 :: _3 :: HNil, _2 :: HNil]
+    - call inductive[_1, _2, _3 :: HNil, _3 :: HNil, HNil]
+    - require implicit Split[_3 :: HNil, _3 :: HNil, HNil]
+    - call basic2[_3] => result is Split[_3 :: HNil, _3 :: HNil, HNil]
+    - everything is built
+   */
+  println(show(validSplit))
+
+  // left LA and right LB are merged to result list L
+  trait Merge[LA <: HList, LB <: HList, L <: HList]
+  object Merge {
+    // Axioms 1: Merge with empty list gives initial list
+    implicit def basicLeft[L <: HList]: Merge[HNil, L, L] = new Merge[HNil, L, L] {}
+    implicit def basicRight[L <: HList]: Merge[L, HNil, L] = new Merge[L, HNil, L] {}
+
+    /*
+      L1 = N1 :: T1
+      L2 = N2 :: T2
+      if N1 < N2 => N1 :: {...}
+      if N2 <= N1 => N2 :: {...}
+     */
+    // IR - intermediate result
+    implicit def inductiveLte[N1 <: Nat, T1 <: HList, N2 <: Nat, T2 <: HList, IR  <: HList]
+      (implicit merge: Merge[T1, N2 :: T2, IR], lte: <=[N1, N2]): Merge[N1 :: T1, N2 :: T2, N1 :: IR] =
+      new Merge[N1 :: T1, N2 :: T2, N1 :: IR] {}
+
+    implicit def inductiveGt[N1 <: Nat, T1 <: HList, N2 <: Nat, T2 <: HList, IR  <: HList]
+      (implicit merge: Merge[N1 :: T1, T2, IR], lte: <[N2, N1]): Merge[N1 :: T1, N2 :: T2, N2 :: IR] =
+      new Merge[N1 :: T1, N2 :: T2, N2 :: IR] {}
+
+    def apply[LA <: HList, LB <: HList, L <: HList](implicit merge: Merge[LA, LB, L]): Merge[LA, LB, L] = merge
+  }
+
+  val validMerge: Merge[_1 :: _3 :: HNil, _2 :: _4 :: HNil, _1 :: _2 :: _3 :: _4 :: HNil] = Merge.apply
+  /*
+    Compiler work:
+    - require Merge[_1 :: _3 :: HNil, _2 :: _4 :: HNil, _1 :: _2 :: _3 :: _4 :: HNil]
+    - run inductiveLte
+    - require implicit Merge[_3 :: HNil, _2 :: _4 :: HNil, _2 :: _3 :: _4 :: HNil],  <=[_1, _2]
+    - run inductiveGt
+    - require implicit Merge[_3 :: HNil, _4 :: HNil, _3 :: _4 :: HNil], <[_2, _3]
+    - run inductiveLte
+    - require implicit Merge[HNil, _4 :: HNil, _4 :: HNil], <=[_3, _4]
+    - run basicLeft[_4 :: HNil]
+   */
+  println(show(validMerge))
+
+
+  // O - output list
+  trait Sort[L <: HList, O <: HList]
+  object Sort {
+    // Axiom 1: Empty list is sorted into empty list
+    implicit val basicNil: Sort[HNil, HNil] = new Sort[HNil, HNil] {}
+    // Axiom 2: List with 1 element is sorted into list of the same 1 element
+    implicit def basicOne[N <: Nat]: Sort[N :: HNil, N :: HNil] = new Sort[N :: HNil, N :: HNil] {}
+    // I - input list
+    implicit def inductive[I <: HList, L <: HList, R <: HList, SL <: HList, SR <: HList, O <: HList]
+      (
+        implicit
+        split: Split[I, L, R],
+        sortLeft: Sort[L, SL],  // SL - sort left list
+        sortRight: Sort[R, SR], // SR - sort right list
+        merge: Merge[SL, SR, O]
+      ): Sort[I, O]  = new Sort[I, O] {}
+    def apply[L <: HList, O <: HList](implicit sort: Sort[L, O]): Sort[L, O] = sort
+  }
+
+  val validSort: Sort[_4 :: _3 :: _5 :: _1 :: _2 :: HNil, _1 :: _2 :: _3 :: _4 :: _5 :: HNil] = Sort.apply
+  println(show(validSort))
+
+  // making compiler return types automatically
+
+  object finalInfer {
+    trait Sort[L <: HList] {type Result <: HList}
+    object Sort {
+      type SortOp[L <: HList, O <: HList] = Sort[L] {type Result = O}
+      implicit val basicNil: SortOp[HNil, HNil] = new Sort[HNil] {type Result = HNil}
+      implicit def basicOne[N <: Nat]: SortOp[N :: HNil, N :: HNil] = new Sort[N :: HNil] {type Result = N :: HNil}
+      implicit def inductive[I <: HList, L <: HList, R <: HList, SL <: HList, SR <: HList, O <: HList]
+      (
+        implicit
+        split: Split[I, L, R],
+        sortLeft: SortOp[L, SL],  // SL - sort left list
+        sortRight: SortOp[R, SR], // SR - sort right list
+        merge: Merge[SL, SR, O]
+      ): SortOp[I, O]  = new Sort[I] {type Result = O}
+      def apply[L <: HList](implicit sort: Sort[L]): SortOp[L, sort.Result] = sort // again the trick sort.Result
+    }
+
+    def runFinalInfer(): Unit ={
+      println(show(Sort.apply[_4 :: _3 :: _5 :: _1 :: _2 :: HNil]))
+    }
+  }
+
+  finalInfer.runFinalInfer()
 }
