@@ -1,6 +1,11 @@
 package ru.ekuzmichev
 
+import ru.ekuzmichev.TypeLevelProgramming.{+, four, two, zero}
+
 object TypeLevelProgramming extends App {
+
+  // Part 1
+
   import scala.reflect.runtime.universe._
 
   // prints type of a value
@@ -70,4 +75,80 @@ object TypeLevelProgramming extends App {
   println(show(lteComparison))
 
 //  val invalidLteComparison: _3 <= _2 = <=[_3, _2] // does not compile
+
+  // Part 2
+
+  // ADD NUMBERS as types
+  trait +[A <: Nat, B <: Nat, S <: Nat] // S - sum between A and B
+  // If compiler could create implicit instance of + for A,B,S
+  // this means that statement A + B = S is true
+  object + {
+    // Aksiom 1: We have as truth: 0 + 0 = 0
+    implicit val zero: +[_0, _0, _0] = new +[_0, _0, _0] {}
+    // Aksiom 2: For any number A <: Nat such that A > 0 => A + 0 and 0 + A = A
+    implicit def basicRight[A <: Nat](implicit lt: _0 < A): +[_0, A, A] = new +[_0, A, A] {}
+    implicit def basicLeft[A <: Nat](implicit lt: _0 < A): +[A, _0, A]  = new +[A, _0, A] {}
+
+    // Inductive reasoning
+    // If A + B = S then Succ[A] + Succ[B] = Succ[Succ[S]] // "S + 2"
+    implicit def inductive[A <: Nat, B <: Nat, S <: Nat](implicit plus: +[A, B, S]): +[Succ[A], Succ[B], Succ[Succ[S]]] =
+      new +[Succ[A], Succ[B], Succ[Succ[S]]] {}
+
+    def apply[A <: Nat, B <: Nat, S <: Nat](implicit plus: +[A, B, S]): +[A, B, S] = plus
+  }
+
+  val zero: +[_0, _0, _0] = +.apply
+  val two: +[_0, _2, _2] = +.apply
+  val four: +[_1, _3, _4] = +.apply
+  /*
+    Compiler works as:
+    - I need an implicit +[1, 3, 4] from apply method
+    - +[1, 3, 4] == +[Succ[0], Succ[2], Succ[Succ[2]]]
+    - +[Succ[0], Succ[2], Succ[Succ[2]]] matches the pattern of implicit inductive method
+    - I need an implicit +[0, 2, 2]
+    - +[0, 2, 2] corresponds to basicRight method
+    - I need an implicit <[0, 2]
+    - <[0, 2] corresponds to implicit ltBasic
+    - done. can construct everything
+   */
+
+//  val invalidFour: +[_2, _3, _4] = +.apply // does not compile
+
+  println(show(zero))
+  println(show(two))
+  println(show(four))
+
+  // How to infer types automatically
+  // Let's change type signatures a little
+  object infer {
+    // We moving Sum type argument to abstract type member
+    trait +[A <: Nat, B <: Nat] { type Result <: Nat }
+    object + {
+      type Plus[A <: Nat, B <: Nat, S <: Nat] = +[A, B] {type Result = S}
+      implicit val zero: Plus[_0, _0, _0] = new +[_0, _0] {type Result = _0}
+      implicit def basicRight[A <: Nat](implicit lt: _0 < A): Plus[_0, A, A] = new +[_0, A] {type Result = A}
+      implicit def basicLeft[A <: Nat](implicit lt: _0 < A): Plus[A, _0, A]  = new +[A, _0] {type Result = A}
+      implicit def inductive[A <: Nat, B <: Nat, S <: Nat](implicit plus: Plus[A, B, S]): Plus[Succ[A], Succ[B], Succ[Succ[S]]] =
+        new +[Succ[A], Succ[B]] {type Result = Succ[Succ[S]]}
+      // We need to force compiler to show Result type to us: Using Plus as return type with reference to type member
+      def apply[A <: Nat, B <: Nat](implicit plus: +[A, B]): Plus[A, B, plus.Result] = plus
+    }
+
+    val zero: +[_0, _0] = +.apply
+    val two: +[_0, _2] = +.apply
+    val four: +[_1, _3] = +.apply
+
+    def runInferExample(): Unit = {
+      println(show(zero))
+      println(show(two))
+      // here is type is "fixed" at the left
+      println(show(four)) // TypeTag[_1 + _3]
+
+      // here is "automatic" inference
+      println(show(+.apply[_1, _3])) // TypeTag[Succ[_0] + Succ[Succ[Succ[_0]]]{type Result = Succ[Succ[Succ[Succ[_0]]]]}]
+    }
+  }
+
+  infer.runInferExample()
+
 }
