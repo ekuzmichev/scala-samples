@@ -61,7 +61,7 @@ object EtaExpansionAndPartiallyAppliedFunctions extends App {
 
   val twoArgsRemaining = threeArgAdder(2) _ // Int => Int => Int // curried fn
   val ten              = twoArgsRemaining(3)(5)
-  val oneArgRemaining  = threeArgAdder(2)(3) // Int => Int
+  val oneArgRemaining  = threeArgAdder(2)(3) _ // Int => Int
   val ten2             = oneArgRemaining(5)
 
 }
