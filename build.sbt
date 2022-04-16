@@ -69,6 +69,7 @@ lazy val lang =
       libraryDependencies ++= Seq(
         libs.commonsIo,
         libs.byteUnits,
+        libs.refined,
         libs.scalaReflect
       ),
       Seq(scalacOptions ++= commonScalaOptions)
@@ -111,6 +112,7 @@ lazy val libs = new {
   val catsV              = "2.7.0"
   val commonsIoV         = "2.6"
   val kafkaStreamsCirceV = "0.6.3"
+  val refinedV           = "0.9.15"
   val zioKafkaV          = "0.14.0"
   val zioV               = "1.0.2"
 
@@ -126,6 +128,7 @@ lazy val libs = new {
   val commonsIo           = "commons-io"                % "commons-io"                     % commonsIoV
   val kafkaStreamsCirce   = "com.goyeau"                %% "kafka-streams-circe"           % kafkaStreamsCirceV
   val munitCatsEffectTest = "org.typelevel"             %% "munit-cats-effect-3"           % "1.0.6" % Test
+  val refined             = "eu.timepit"                %% "refined"                       % refinedV
   val scalaReflect        = "org.scala-lang"            % "scala-reflect"                  % scalaV
   val zio                 = "dev.zio"                   %% "zio"                           % zioV
   val zioKafka            = "dev.zio"                   %% "zio-kafka"                     % zioKafkaV
