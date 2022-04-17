@@ -25,7 +25,15 @@ lazy val `akka-samples` =
     .settings(
       libraryDependencies ++= Seq(
         libs.akkaActorTyped,
-        libs.akkaStream
+        libs.akkaStream,
+        libs.akkaHttp,
+        libs.akkaHttpSprayJson,
+        libs.akkaHttpCirce,
+        libs.akkaHttpJackson,
+        libs.circeCore,
+        libs.circeGeneric,
+        libs.circeParser,
+        libs.slf4jSimple
       ),
       Seq(scalacOptions ++= commonScalaOptions)
     )
@@ -105,31 +113,43 @@ lazy val commonScalaOptions =
   )
 
 lazy val libs = new {
-  val akkaVersion        = "2.6.19"
-  val byteUnitsV         = "0.9.1"
-  val catsEffectV        = "3.3.0"
-  val catsRetryV         = "1.1.0"
-  val catsV              = "2.7.0"
-  val commonsIoV         = "2.6"
-  val kafkaStreamsCirceV = "0.6.3"
-  val refinedV           = "0.9.15"
-  val zioKafkaV          = "0.14.0"
-  val zioV               = "1.0.2"
+  val akkaVersion              = "2.6.19"
+  val akkaHttpV                = "10.2.0"
+  val akkaHttpJsonSerializersV = "1.34.0"
+  val byteUnitsV               = "0.9.1"
+  val catsEffectV              = "3.3.0"
+  val catsRetryV               = "1.1.0"
+  val catsV                    = "2.7.0"
+  val circeV                   = "0.12.3"
+  val commonsIoV               = "2.6"
+  val kafkaStreamsCirceV       = "0.6.3"
+  val refinedV                 = "0.9.15"
+  val slf4jV                   = "1.7.10"
+  val zioKafkaV                = "0.14.0"
+  val zioV                     = "1.0.2"
 
-  val akkaActorTyped      = "com.typesafe.akka"         %% "akka-actor-typed"              % akkaVersion withSources () withJavadoc ()
-  val akkaStream          = "com.typesafe.akka"         %% "akka-stream"                   % akkaVersion withSources () withJavadoc ()
+  val akkaActorTyped      = "com.typesafe.akka"         %% "akka-actor-typed"              % akkaVersion
+  val akkaHttp            = "com.typesafe.akka"         %% "akka-http"                     % akkaHttpV
+  val akkaHttpSprayJson   = "com.typesafe.akka"         %% "akka-http-spray-json"          % akkaHttpV
+  val akkaHttpCirce       = "de.heikoseeberger"         %% "akka-http-circe"               % akkaHttpJsonSerializersV
+  val akkaHttpJackson     = "de.heikoseeberger"         %% "akka-http-jackson"             % akkaHttpJsonSerializersV
+  val akkaStream          = "com.typesafe.akka"         %% "akka-stream"                   % akkaVersion
   val byteUnits           = "com.jakewharton.byteunits" % "byteunits"                      % byteUnitsV
-  val catsCore            = "org.typelevel"             %% "cats-core"                     % catsV withSources () withJavadoc ()
-  val catsEffect          = "org.typelevel"             %% "cats-effect"                   % catsEffectV withSources () withJavadoc ()
+  val catsCore            = "org.typelevel"             %% "cats-core"                     % catsV
+  val catsEffect          = "org.typelevel"             %% "cats-effect"                   % catsEffectV
   val catsEffectScalatest = "org.typelevel"             %% "cats-effect-testing-scalatest" % "1.4.0" % Test
   val catsEffectTestkit   = "org.typelevel"             %% "cats-effect-testkit"           % catsEffectV % Test
-  val catsFree            = "org.typelevel"             %% "cats-free"                     % catsV withSources () withJavadoc ()
+  val catsFree            = "org.typelevel"             %% "cats-free"                     % catsV
   val catsRetry           = "com.github.cb372"          %% "cats-retry"                    % catsRetryV
   val commonsIo           = "commons-io"                % "commons-io"                     % commonsIoV
+  val circeCore           = "io.circe"                  %% "circe-core"                    % circeV
+  val circeGeneric        = "io.circe"                  %% "circe-generic"                 % circeV
+  val circeParser         = "io.circe"                  %% "circe-parser"                  % circeV
   val kafkaStreamsCirce   = "com.goyeau"                %% "kafka-streams-circe"           % kafkaStreamsCirceV
   val munitCatsEffectTest = "org.typelevel"             %% "munit-cats-effect-3"           % "1.0.6" % Test
   val refined             = "eu.timepit"                %% "refined"                       % refinedV
   val scalaReflect        = "org.scala-lang"            % "scala-reflect"                  % scalaV
+  val slf4jSimple         = "org.slf4j"                 % "slf4j-simple"                   % slf4jV
   val zio                 = "dev.zio"                   %% "zio"                           % zioV
   val zioKafka            = "dev.zio"                   %% "zio-kafka"                     % zioKafkaV
   val zioStreams          = "dev.zio"                   %% "zio-streams"                   % zioV
