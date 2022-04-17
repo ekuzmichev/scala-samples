@@ -1,3 +1,3 @@
 # scala_samples
-Scala-related libraries sandbox
+Scala 2 related libraries sandbox
 
