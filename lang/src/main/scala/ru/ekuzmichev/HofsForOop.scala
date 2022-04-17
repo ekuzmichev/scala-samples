@@ -17,7 +17,7 @@ object HofsForOop extends App {
     override def apply(i: Int): Int = i + 1
   }
   incrementer.apply(2) // 3
-  incrementer(2)       // 3
+  incrementer(2) // 3
 
   // syntax sugar
   val incrementerAlt = (i: Int) => i + 1
