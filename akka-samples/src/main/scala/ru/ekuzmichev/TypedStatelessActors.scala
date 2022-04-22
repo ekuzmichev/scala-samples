@@ -31,7 +31,7 @@ object TypedStatelessActors extends App {
         happiness -= 2
         Behaviors.same
       case _            =>
-        context.log.info("R[Stateful] eceives smth I don't know")
+        context.log.info("[Stateful] Receives smth I don't know")
         Behaviors.same
     }
   }
@@ -41,7 +41,7 @@ object TypedStatelessActors extends App {
     msg match {
       case EatChocolate =>
         context.log.info(s"[Stateless] ($happiness). Eating chocolate")
-        emotionalFunctionalActor(happiness + 1) // new behavior
+        emotionalFunctionalActor(happiness + 1) // new behavior // returns immediately, so it's not true recursive call
       case LearnAkka    =>
         context.log.info(s"[Stateless] ($happiness). Learning Akka")
         emotionalFunctionalActor(happiness + 10)
