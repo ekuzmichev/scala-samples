@@ -117,8 +117,10 @@ lazy val `zio-amqp` =
   project
     .settings(
       libraryDependencies ++= Seq(
-        "dev.zio" %% "zio"      % "2.1.9",
-        "dev.zio" %% "zio-amqp" % "1.0.0"
+        "dev.zio"  %% "zio"          % "2.1.9",
+        "dev.zio"  %% "zio-amqp"     % "1.0.0",
+        "dev.zio"  %% "zio-logging"  % "2.3.1",
+        "org.slf4j" % "slf4j-simple" % "2.0.16"
       ),
       Seq(scalacOptions ++= commonScalaOptions)
     )
