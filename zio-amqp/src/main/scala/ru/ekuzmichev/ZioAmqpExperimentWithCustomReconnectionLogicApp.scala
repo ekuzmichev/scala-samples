@@ -8,7 +8,28 @@ import zio.logging._
 
 import java.net.URI
 
-object ZioAmqpApp extends ZIOAppDefault {
+/**
+ * Experiment with usage of [[zio.ZPool]] holding [[com.rabbitmq.client.Connection]]:
+ *
+ * - RabbitMQ broker is in shutdown state
+ *
+ * - Application starts
+ *
+ * - [[zio.ZPool]] initiates [[com.rabbitmq.client.Connection]] creation (obviously failed in the background)
+ *
+ * - RabbitMQ broker starts
+ *
+ * - One gets connection from [[zio.ZPool]]
+ *
+ * '''AS IS''': Fiber is failed while performing `pool.get` due to `.orDie` call inside release connection function
+ * and calling `.close()` on [[com.rabbitmq.client.Connection]]
+ *
+ * '''TO BE''': [[com.rabbitmq.client.Connection]] retrieval is successful
+ *
+ * '''Solution''': Usage of `.ignore` instead of `.orDie` inside release connection function,
+ * retry and invalidation of connection in [[zio.ZPool]] solves the problem
+ */
+object ZioAmqpExperimentWithCustomReconnectionLogicApp extends ZIOAppDefault {
 
   override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] =
     Runtime.removeDefaultLoggers >>> consoleLogger(ConsoleLoggerConfig.default.copy(format = LogFormat.colored))
@@ -19,7 +40,7 @@ object ZioAmqpApp extends ZIOAppDefault {
 
       _ <- Console.readLine("Continue?\n")
 
-      // Either stop (if RabbitMQ is running) or start (if RabbitMQ is down) & press ENTER
+      // Either stop RabbitMQ (if it is running) or start it (if it is down) & press ENTER
 
       connection <- getConnectionFrom(pool)
 
