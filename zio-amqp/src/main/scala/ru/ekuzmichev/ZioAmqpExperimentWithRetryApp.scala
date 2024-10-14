@@ -8,18 +8,18 @@ import zio.logging._
 /**
  * Experiment with usage of [[zio.ZPool]] holding [[com.rabbitmq.client.Connection]]:
  *
- * - RabbitMQ broker is in shutdown state
+ *   - RabbitMQ broker is in shutdown state
  *
- * - Application starts
+ *   - Application starts
  *
- * - [[zio.ZPool]] initiates [[com.rabbitmq.client.Connection]] creation (obviously failed in the background)
+ *   - [[zio.ZPool]] initiates [[com.rabbitmq.client.Connection]] creation (obviously failed in the background)
  *
- * - RabbitMQ broker starts
+ *   - RabbitMQ broker starts
  *
- * - One gets connection from [[zio.ZPool]]
+ *   - One gets connection from [[zio.ZPool]]
  *
- * '''AS IS''': Fiber is failed while performing `pool.get` due to `.orDie` call inside release connection function
- * and calling `.close()` on [[com.rabbitmq.client.Connection]]
+ * '''AS IS''': Fiber is failed while performing `pool.get` due to `.orDie` call inside release connection function and
+ * calling `.close()` on [[com.rabbitmq.client.Connection]]
  *
  * '''TO BE''': [[com.rabbitmq.client.Connection]] retrieval is successful
  *
@@ -31,7 +31,7 @@ object ZioAmqpExperimentWithRetryApp extends ZIOAppDefault {
     Runtime.removeDefaultLoggers >>> consoleLogger(ConsoleLoggerConfig.default.copy(format = LogFormat.colored))
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] =
-    for {
+    (for {
       pool <- ZPool.make(zio.amqp.Amqp.connect(AMQPConfig.default), 1)
 
       _ <- Console.readLine("Continue?\n")
@@ -44,7 +44,20 @@ object ZioAmqpExperimentWithRetryApp extends ZIOAppDefault {
           .retry(Schedule.recurs(3) && Schedule.exponential(500.milliseconds))
 
       _ <- ZIO.log(s"Connection from pool: ${toString(connection)}")
-    } yield ()
+    } yield ())
+      /**
+       * The problem here:
+       *   - RabbitMQ is running
+       *   - App is started
+       *   - RabbitMQ is stopped
+       *   - Enter pressed in console
+       *   - The exception is thrown in the thread other than main due to .orDie in release action
+       *     com.rabbitmq.client.AlreadyClosedException: connection is already closed due to connection error; protocol
+       *     method: #method<connection.close>(reply-code=320, reply-text=CONNECTION_FORCED - broker forced connection
+       *     closure with reason 'shutdown', class-id=0, method-id=0)
+       *   - The exception/cause is not caught and it is difficult to handle it
+       */
+      .catchAllCause(cause => ZIO.logError(s"Caught error: $cause"))
 
   private def toString(connection: Connection): String =
     s"$connection (${if (connection.isOpen) "open" else "not open"})"
