@@ -1,4 +1,4 @@
-package ru.ekuzmichev.zio
+package ru.ekuzmichev.zio1
 
 import zio._
 import zio.duration._

@@ -20,7 +20,8 @@ lazy val root =
       lang,
       lenses,
       `zio-amqp`,
-      `zio-samples`,
+      `zio1-samples`,
+      `zio2-samples`,
       `zio-kafka`
     )
 
@@ -125,10 +126,17 @@ lazy val `zio-amqp` =
       Seq(scalacOptions ++= commonScalaOptions)
     )
 
-lazy val `zio-samples` =
+lazy val `zio1-samples` =
   project
     .settings(
       libraryDependencies ++= Seq("dev.zio" %% "zio" % "1.0.2"),
+      Seq(scalacOptions ++= commonScalaOptions)
+    )
+
+lazy val `zio2-samples` =
+  project
+    .settings(
+      libraryDependencies ++= Seq("dev.zio" %% "zio" % "2.1.9"),
       Seq(scalacOptions ++= commonScalaOptions)
     )
 
